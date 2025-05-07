@@ -8,32 +8,40 @@ import pickle
 class MyModel:
 
     def __init__(self, model_name: str):
-        self.model = self.load_model(model_name)
+        self.model: LogisticRegression = MyModel.load_model(model_name)
+        self.model_name = model_name
+        self.accuracy = 0.0
 
     @staticmethod
-    def create_model():
+    def create_model() -> LogisticRegression:
         X, y = load_iris(return_X_y=True)
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
         model: LogisticRegression = LogisticRegression(random_state=42, max_iter=80)
         model.fit(x_train, y_train)
-        acc = accuracy_score(y_test, model.predict(x_test))
-        print(f"model accuracy: {acc * 100:.2f}%")
+        accuracy = accuracy_score(y_test, model.predict(x_test))
+        print(f"model accuracy: {accuracy * 100:.2f}%")
         return model
 
-    def save_model(self, file_name: str) -> None:
-        with open(file_name, 'wb') as file:
-            pickle.dump(self, file)
+    def save_model(self) -> None:
+        with open(self.model_name, 'wb') as file:
+            pickle.dump(self.model, file)
 
-    def load_model(self, file_name: str) -> LogisticRegression:
+    @staticmethod
+    def load_model(file_name) -> LogisticRegression:
         try:
             with open(file_name, 'rb') as file:
                 model = pickle.load(file)
         except FileNotFoundError:
-            model = self.create_model()
-            self.save_model(file_name)
-        return model
+            model = MyModel.create_model()
+            return model
 
-    if __name__ == '__main__':
-        filename: str = "model.pkl"
-        model = create_model()
-        save_model(model, filename)
+    def get_accuracy(self):
+        X, y = load_iris(return_X_y=True)
+        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+        return accuracy_score(y_test, self.model.predict(x_test))
+
+
+if __name__ == '__main__':
+    filename: str = "model.pkl"
+    model = MyModel(filename)
+    model.save_model()
