@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from flask import Flask, jsonify, request
 from sklearn.datasets import load_iris
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 from model import load_model
 
@@ -16,12 +18,14 @@ def hello_world():  # put application's code here
     return {"message": "hello world"}
 
 
+fille_name: str = "model.pkl"
+
+
 @app.route('/predict', methods=['GET'])  # zdania 1 i 2
 def predict():
     try:
         if not request.is_json:
             raise Exception("Request must be json")
-        fille_name: str = "model.pkl"
         model: LogisticRegression = load_model(fille_name)
         data = request.get_json()
         iris = load_iris()
@@ -58,6 +62,14 @@ def health():
         }
     }
     return jsonify(server_info), 200
+
+
+@app.route('/accuracy', methods=['GET'])
+def get_accuracy():
+    model = load_model(fille_name)
+    X, y = load_iris(return_X_y=True)
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    return jsonify(accuracy_score(y_test, model.predict(x_test)))
 
 
 if __name__ == '__main__':
