@@ -13,7 +13,7 @@ app = Flask(__name__)
 start_time = time.time()
 
 
-@app.route('/')  # zadanie 1
+@app.route('/')
 def hello_world():  # put application's code here
     return {"message": "hello world"}
 
@@ -21,7 +21,7 @@ def hello_world():  # put application's code here
 fille_name: str = "model.pkl"
 
 
-@app.route('/predict', methods=['GET'])  # zdania 1 i 2
+@app.route('/predict', methods=['GET'])
 def predict():
     try:
         if not request.is_json:
@@ -41,7 +41,7 @@ def predict():
         return jsonify({"Error": f"{e}"}), 400
 
 
-@app.route('/info', methods=['GET'])  # zadanie 4
+@app.route('/info', methods=['GET'])
 def info():
     model: LogisticRegression = load_model("model.pkl")
     model_info: dict = {
@@ -53,7 +53,7 @@ def info():
     return jsonify(model_info), 200
 
 
-@app.route('/health', methods=['GET'])  # zadanie 4
+@app.route('/health', methods=['GET'])
 def health():
     server_info: dict = {
         "server-info": {
